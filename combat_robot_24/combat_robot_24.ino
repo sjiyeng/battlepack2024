@@ -9,7 +9,7 @@ int currentStep = 0;
 //Constants
 bool invertLeft = false;
 bool invertRight = false;
-bool brakeDrivetrain = false;
+bool brakeDrivetrain = true;
 int leftPin1 = 0;
 int leftPin2 = 1;
 int rightPin1 = 2;
@@ -79,7 +79,7 @@ void loop() {
   allowEnable = checkAllowEnable(connected, enableButton);
   arcadeDrive(translation, rotation);
   driveMotor(leftPin1, leftPin2, invertLeft, leftMotorSpeed, brakeDrivetrain, allowEnable);
-  //driveMotor(rightPin1, rightPin2, invertRight, rightMotorSpeed, brakeDrivetrain, allowEnable);
+  driveMotor(rightPin1, rightPin2, invertRight, rightMotorSpeed, brakeDrivetrain, allowEnable);
 
   bool dataUpdated = BP32.update();
   if (dataUpdated)
@@ -87,6 +87,5 @@ void loop() {
   vTaskDelay(1);
 
   //Debugging
-  Serial.printf("Left Motor Speed: %.2F || Right Motor Speed: %.2F || Pin 1 Value: %d || Pin 2 Value: %d\n",leftMotorSpeed,rightMotorSpeed,pin1Value,pin2Value);
-  //Serial.printf("Translation: %.2F || Rotation: %.2F || Button A: %d || Left Bumper: %d\n",translation,rotation,a,lb);
+  //Serial.printf("Left Motor Speed: %.2F || Right Motor Speed: %.2F || Pin 1 Value: %d || Pin 2 Value: %d\n",leftMotorSpeed,rightMotorSpeed,pin1Value,pin2Value);
 }
