@@ -1,4 +1,5 @@
 #include <Bluepad32.h>
+#include <ESP32Servo.h>
 
 //timer
 unsigned long startTime; // Variable to store start time
@@ -9,11 +10,9 @@ int currentStep = 0;
 //Constants
 bool invertLeft = false;
 bool invertRight = false;
-bool brakeDrivetrain = true;
-int leftPin1 = 0;
-int leftPin2 = 1;
-int rightPin1 = 2;
-int rightPin2 = 3;
+int leftMotorPin = 0;
+int rightMotorPin = 1;
+
 
 
 //Variables
@@ -28,10 +27,12 @@ bool allowEnable = false;
 bool enableButton = false;
 float leftMotorSpeed;
 float rightMotorSpeed;
-int pin1Value;
-int pin2Value;
+float leftMotorOut;
+float rightMotorOut;
 
 
+Servo leftMotor;
+Servo rightMotor;
 
 ControllerPtr myControllers[BP32_MAX_GAMEPADS];
 
@@ -42,10 +43,9 @@ void setup() {
   isRunning = true; // Set running flag to true
 
   //attach pins
-  pinMode(leftPin1, OUTPUT);
-  pinMode(leftPin2, OUTPUT);
-  pinMode(rightPin1, OUTPUT);
-  pinMode(rightPin2, OUTPUT);
+  leftMotor.attach(leftMotorPin);
+  rightMotor.attach(rightMotorPin);
+
 
   //controller
   Serial.printf("Firmware: %s\n", BP32.firmwareVersion());
@@ -72,14 +72,23 @@ void loop() {
     delay(250);
     ctl->playDualRumble(0, 250, 0x80, 0x40);
   }
-  if(a){
-    testRoutine();
-  }
+
 
   allowEnable = checkAllowEnable(connected, enableButton);
   arcadeDrive(translation, rotation);
-  driveMotor(leftPin1, leftPin2, invertLeft, leftMotorSpeed, brakeDrivetrain, allowEnable);
-  driveMotor(rightPin1, rightPin2, invertRight, rightMotorSpeed, brakeDrivetrain, allowEnable);
+  leftMotorOut = 1500 + leftMotorSpeed * 500;
+  rightMotorOut = 1500 + rightMotorSpeed * 500;
+  if (allowEnable){
+  leftMotor.writeMicroseconds(leftMotorOut);
+  rightMotor.writeMicroseconds(rightMotorOut);
+  }
+  else {
+  leftMotorOut = 1500;
+  rightMotorOut = 1500;
+  leftMotor.writeMicroseconds(leftMotorOut);
+  rightMotor.writeMicroseconds(rightMotorOut);
+
+  }
 
   bool dataUpdated = BP32.update();
   if (dataUpdated)
@@ -87,5 +96,5 @@ void loop() {
   vTaskDelay(1);
 
   //Debugging
-  Serial.printf("Left Motor Speed: %.2F || Right Motor Speed: %.2F || Pin 1 Value: %d || Pin 2 Value: %d\n",leftMotorSpeed,rightMotorSpeed,pin1Value,pin2Value);
+  Serial.printf("Left Motor Speed: %.2F || Right Motor Speed: %.2F\n",leftMotorOut,rightMotorOut);
 }
