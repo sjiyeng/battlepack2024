@@ -10,8 +10,8 @@ int currentStep = 0;
 //Constants
 bool invertLeft = false;
 bool invertRight = false;
-int leftMotorPin = 0;
-int rightMotorPin = 1;
+int leftMotorPin = A0;
+int rightMotorPin = A1;
 
 
 
